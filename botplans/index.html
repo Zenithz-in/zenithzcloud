@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="site-title">Zenithz Cloud | Premium Discord Bot Hosting</title>
+    <meta id="site-description" name="description" content="High-performance and reliable Discord bot hosting. Engineered for 24/7 online runtimes.">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* --- Brand Design & Variables --- */
+        :root {
+            --bg-base: #030305;
+            --bg-card: rgba(9, 9, 14, 0.65);
+            --bg-glass: rgba(13, 13, 20, 0.45);
+            --accent-red: #ff2a4b;
+            --accent-red-hover: #d61331;
+            --accent-glow: rgba(255, 42, 75, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #9aa0b6;
+            --text-dim: #52586c;
+            --border-subtle: rgba(255, 255, 255, 0.05);
+            --border-glow: rgba(255, 42, 75, 0.4);
+            --radius-main: 16px;
+            --font-mono: "SFMono-Regular", Consolas, monospace;
+            --gradient-red-white: linear-gradient(135deg, #ff2a4b 0%, #ff768a 50%, #ffffff 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            letter-spacing: -0.01em;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            width: 100%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- Animated Cosmic Particle Background --- */
+        .bg-glow-system {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 0%, #0c0812 0%, var(--bg-base) 70%);
+        }
+
+        .bg-glow-system::before, .bg-glow-system::after {
+            content: "";
+            position: absolute;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            mix-blend-mode: screen;
+            filter: blur(80px);
+        }
+
+        .bg-glow-system::before {
+            top: -200px; left: -100px;
+            animation: glow-move 25s infinite alternate ease-in-out;
+        }
+
+        .bg-glow-system::after {
+            bottom: -200px; right: -100px;
+            animation: glow-move 30s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes glow-move {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 150px) scale(1.2); }
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center top;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 90%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 90%);
+            z-index: -1;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- View Container Management --- */
+        .app-view {
+            display: none;
+            opacity: 0;
+            width: 100%;
+        }
+
+        .app-view.view-active {
+            display: block;
+            opacity: 1;
+            animation: smoothFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes smoothFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        section {
+            padding: clamp(120px, 8vw, 150px) 0;
+            position: relative;
+        }
+
+        .meta-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--accent-red);
+            margin-bottom: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            background: rgba(255, 42, 75, 0.08);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 42, 75, 0.15);
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .body-lead {
+            font-size: clamp(16px, 1.2vw, 18px);
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin-bottom: 48px;
+        }
+
+        /* --- Navigation Header --- */
+        header {
+            width: 100%;
+            background-color: rgba(3, 3, 5, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            position: fixed;
+            top: 0; left: 0; z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-image {
+            height: 34px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: clamp(18px, 1.4vw, 21px);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            background: var(--gradient-red-white);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            transition: color 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-back {
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--text-secondary);
+            transform: translateX(-4px);
+        }
+
+        /* --- Control Options Panel --- */
+        .control-panel-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-main);
+            padding: 24px;
+            margin-bottom: 32px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .control-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-block label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .custom-select-wrapper {
+            position: relative;
+        }
+
+        .custom-select {
+            width: 100%;
+            background: rgba(5, 5, 8, 0.8);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: all 0.25s ease;
+        }
+
+        .custom-select:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .custom-select-wrapper::after {
+            content: "▼";
+            font-size: 9px;
+            color: var(--text-dim);
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        /* --- Language Grid Layout --- */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-main);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .game-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-8px);
+            box-shadow: 0 24px 60px rgba(255, 42, 75, 0.12);
+        }
+
+        .game-banner {
+            width: 100%;
+            height: 140px;
+            position: relative;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: rgba(2, 2, 4, 0.4);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 20px;
+            transition: transform 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-banner-image {
+            height: 65px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Pure CSS Rendered Elements for Fixed Cards */
+        .css-logo-frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 75px;
+            height: 75px;
+            position: relative;
+        }
+
+        .rust-logo-html {
+            border: 5px dashed #ce412b;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            color: #ffffff;
+            font-size: 24px;
+            background: rgba(206, 65, 43, 0.1);
+            text-shadow: 0 0 10px rgba(206, 65, 43, 0.6);
+        }
+
+        .deno-logo-html {
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            width: 62px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 32px;
+            border: 3px solid #000000;
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
+        }
+
+        .bun-logo-html {
+            background: linear-gradient(135deg, #fbf7ee 0%, #f4e7d3 100%);
+            border-radius: 22px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            border: 2px solid #eccfa4;
+            box-shadow: 0 0 15px rgba(244, 231, 211, 0.3);
+        }
+
+        .game-card:hover .game-banner {
+            transform: scale(1.03);
+        }
+
+        .game-badge {
+            position: absolute;
+            top: 14px; right: 14px;
+            background: #030305;
+            border: 1px solid var(--accent-red);
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .game-content {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.3));
+        }
+
+        .game-header h3 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .game-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 64px;
+        }
+
+        .game-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding-top: 16px;
+            margin-bottom: 20px;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .spec-icon {
+            color: var(--accent-red);
+            display: flex;
+            background: rgba(255, 42, 75, 0.1);
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        .spec-details span {
+            display: block;
+            font-size: 9px;
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .spec-details strong {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .btn-order {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--accent-red);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 42, 75, 0.3);
+        }
+
+        .btn-order:hover {
+            background: var(--accent-red-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 42, 75, 0.5);
+        }
+
+        /* --- Architecture Selector --- */
+        .architecture-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .arch-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-main);
+            padding: 26px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .arch-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .arch-card.arch-selected {
+            border-color: var(--accent-red);
+            background: linear-gradient(180deg, rgba(255, 42, 75, 0.05) 0%, rgba(9, 9, 14, 0.8) 100%);
+            box-shadow: 0 10px 30px rgba(255, 42, 75, 0.1);
+        }
+
+        .arch-card h3 {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .arch-card p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .arch-rate {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .arch-rate span {
+            color: var(--accent-red);
+        }
+
+        /* --- Plans Configurator Grid --- */
+        .plans-display-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .plan-spec-card {
+            background: linear-gradient(180deg, rgba(14,14,22,0.7) 0%, rgba(8,8,12,0.9) 100%);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-main);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.4s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .plan-spec-card.updated-anim {
+            animation: planRefresh 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes planRefresh {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .plan-spec-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .plan-spec-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .plan-spec-header h4 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .plan-spec-header .plan-price {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .plan-spec-header .plan-price span {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .matrix-spec-list {
+            list-style: none;
+            margin-bottom: 28px;
+        }
+
+        .matrix-spec-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .matrix-spec-list .spec-meta-title {
+            display: block;
+            font-size: 9px;
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .matrix-spec-list .spec-meta-value {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .matrix-spec-list .spec-list-icon {
+            color: var(--accent-red);
+            display: flex;
+            background: rgba(255, 42, 75, 0.08);
+            padding: 6px;
+            border-radius: 6px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 80px 0 40px 0;
+            border-top: 1px solid var(--border-subtle);
+            background-color: #020203;
+            margin-top: 120px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-brand h4 {
+            font-size: clamp(16px, 1.3vw, 19px);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            background: var(--gradient-red-white);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 380px;
+            line-height: 1.7;
+        }
+
+        .footer-column-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .footer-list {
+            list-style: none;
+        }
+
+        .footer-list li {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .footer-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.25s ease, transform 0.25s ease;
+            display: inline-block;
+        }
+
+        .footer-list a:hover {
+            color: var(--text-primary);
+            transform: translateX(2px);
+        }
+
+        .footer-bottom-bar {
+            border-top: 1px solid rgba(255,255,255,0.03);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* --- Responsive Styles --- */
+        @media (max-width: 1200px) {
+            .games-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 1150px) {
+            .plans-display-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 850px) {
+            .games-grid, .architecture-selector, .footer-grid { grid-template-columns: 1fr; }
+            .control-panel-wrapper { grid-template-columns: 1fr; gap: 16px; }
+        }
+        @media (max-width: 720px) {
+            .plans-display-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+
+        /* --- Modal Overlays --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(2, 2, 3, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 200000;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        .modal-card {
+            background: #07070a;
+            border: 1px solid rgba(255, 42, 75, 0.3);
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 30px 70px rgba(255, 42, 75, 0.15);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            color: #a1a3b0;
+            cursor: pointer;
+            font-size: 20px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow-system"></div>
+    <div class="bg-grid"></div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="https://zenithzcloud.com" class="logo-container">
+                    <img src="https://i.postimg.cc/j2cPKNkn/Zenithzcloudlogo.png" alt="Zenithz Cloud Logo" class="logo-image">
+                    <div class="logo-text">Zenithz Cloud</div>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="event.preventDefault(); navigateToRoute('/botplans')">Hosting Plans</a></li>
+                    <li><a href="mailto:zenithzcloudpvt@gmail.com">Contact Support</a></li>
+                </ul>
+                <button id="nav-action-btn" class="btn-back" onclick="navigateToRoute('/botplans')" style="visibility: hidden;">
+                    <i data-lucide="arrow-left" style="width:14px; height:14px;"></i> Return Home
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="view-games-overview" class="app-view view-active">
+        <section>
+            <div class="container">
+                <span class="meta-tag"><i data-lucide="terminal" style="width:12px; height:12px;"></i> Universal Cluster Fleet</span>
+                <h2 class="section-title">Select Your Programming Language</h2>
+                <p class="body-lead">Choose the environment your Discord bot runs on. We provide stable, 24/7 continuous hosting with high-speed internet connectivity.</p>
+
+                <div class="games-grid" id="languages-catalog-mount">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <main id="view-game-configurator" class="app-view">
+        <section>
+            <div class="container">
+                <span class="meta-tag" id="config-meta-title">Configuration Terminal</span>
+                <h2 class="section-title" id="config-main-title">Bot Server Plans</h2>
+                <p class="body-lead">Select your server resource sizes, location, and preferred currency rates down below to configure your bot host.</p>
+
+                <div class="control-panel-wrapper">
+                    <div class="control-block">
+                        <label><i data-lucide="globe" style="width:13px; height:13px;"></i> Datacenter Zone Location</label>
+                        <div class="custom-select-wrapper">
+                            <select id="location-select" class="custom-select" onchange="handleLocationOrCurrencyChange()">
+                                <option value="India">India (Mumbai Server) - Online</option>
+                                <option value="Singapore">Singapore (SGP Hub) - Online</option>
+                                <option value="Germany">Germany (Frankfurt Server) - Online</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-block">
+                        <label><i data-lucide="coins" style="width:13px; height:13px;"></i> Payment Currency Type</label>
+                        <div class="custom-select-wrapper">
+                            <select id="currency-select" class="custom-select" onchange="handleLocationOrCurrencyChange()">
+                                <option value="INR">INR (₹) - Indian Rupee Rates</option>
+                                <option value="USD">USD ($) - US Dollar Rates</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="architecture-selector">
+                    <div id="arch-amd" class="arch-card arch-selected" onclick="selectArchitecture('amd')">
+                        <h3><i data-lucide="zap" style="width:18px; height:18px; color:var(--accent-red)"></i> AMD Ryzen High Speed Processor</h3>
+                        <p>Fast clock speeds optimized for quick responsive commands execution.</p>
+                        <div class="arch-rate">Base Price Rate: <span id="rate-display-amd">₹49 / GB</span></div>
+                    </div>
+
+                    <div id="arch-intel" class="arch-card" onclick="selectArchitecture('intel')">
+                        <h3><i data-lucide="cpu" style="width:18px; height:18px; color:var(--accent-red)"></i> Intel Xeon Enterprise Core</h3>
+                        <p>Multi-threaded stable layout configurations built for heavy data scripts.</p>
+                        <div class="arch-rate">Base Price Rate: <span id="rate-display-intel">₹29 / GB</span></div>
+                    </div>
+                </div>
+
+                <div class="plans-display-grid" id="dynamic-plans-container"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h4>Zenithz Cloud™</h4>
+                    <p>Premium server hosting made simple and accessible. High-speed running hours for your creative online bot scripts.</p>
+                </div>
+                <div>
+                    <div class="footer-column-title">Navigation Links</div>
+                    <ul class="footer-list">
+                        <li><a href="#" onclick="event.preventDefault(); navigateToRoute('/botplans')">Bot Hosting Plans</a></li>
+                        <li><a href="mailto:zenithzcloudpvt@gmail.com">Help & Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-column-title">Our Ecosystem</div>
+                    <ul class="footer-list">
+                        <li><a href="https://discord.gg/KwgKHheZBP" target="_blank" rel="noopener">Official Discord Server</a></li>
+                        <li><a href="https://youtube.com/@zenithzcloud" target="_blank" rel="noopener">YouTube Channel</a></li>
+                        <li><a href="https://www.instagram.com/zenithzcloud" target="_blank" rel="noopener">Instagram Page</a></li>
+                        <li><a href="https://whatsapp.com/channel/0029VbCunRq002T1eUt7rx3R" target="_blank" rel="noopener">WhatsApp Channel</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom-bar">
+                <div>
+                    <strong>Secure Operations Host Cluster</strong>
+                    <p style="margin-top: 4px; color: var(--text-secondary);">Email Support: <a href="mailto:zenithzcloudpvt@gmail.com" style="color: var(--accent-red); text-decoration:none; font-weight:700;">zenithzcloudpvt@gmail.com</a></p>
+                </div>
+                <div>
+                    <p>&copy; 2026 Zenithz Cloud Systems. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="purchase-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closePurchaseModal()">&times;</button>
+            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 12px;">Order Your Bot Host</h3>
+            <p style="color: #a1a3b0; font-size: 14px; margin-bottom: 24px;">Please connect to one of our network channels to complete your server setup process with an agent.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <a href="https://discord.gg/KwgKHheZBP" target="_blank" onclick="closePurchaseModal()" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #5865F2; color: white; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.1);">
+                    Order on Discord
+                </a>
+                <a href="https://youtube.com/@zenithzcloud" target="_blank" onclick="closePurchaseModal()" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: #FF0000; color: white; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.1);">
+                    Visit YouTube Channel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function reloadLucideIcons() {
+            try { lucide.createIcons(); } catch (err) { console.warn(err); }
+        }
+
+        // Expanded 12-Language Routing Data Matrix Catalog with HTML-defined element checks
+        const gameRoutingCatalog = {
+            nodejs: {
+                title: "Node.js Bot Server Plans",
+                meta: "Configuration Terminal // Node.js App",
+                seoTitle: "Zenithz Cloud | Node.js Bot Hosting",
+                desc: "Perfect for JavaScript and TypeScript bots built with discord.js and command handlers.",
+                badge: "Node.js v20+",
+                runtime: "V8 Engine",
+                pkg: "npm / yarn",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
+            },
+            nodemon: {
+                title: "Nodemon Bot Server Plans",
+                meta: "Configuration Terminal // Nodemon Hot-Reload",
+                seoTitle: "Zenithz Cloud | Nodemon Bot Hosting",
+                desc: "Great for active JavaScript and TypeScript development setups with immediate crash-restarts.",
+                badge: "Auto Reload",
+                runtime: "Node Core",
+                pkg: "package.json",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+            },
+            python: {
+                title: "Python Bot Server Plans",
+                meta: "Configuration Terminal // Python App",
+                seoTitle: "Zenithz Cloud | Python Bot Hosting",
+                desc: "Sustain persistent background async loops via highly optimized Python processing.",
+                badge: "Python v3.11+",
+                runtime: "CPython Async",
+                pkg: "pip / pipenv",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
+            },
+            java: {
+                title: "Java & Kotlin Bot Plans",
+                meta: "Configuration Terminal // JVM Runtime",
+                seoTitle: "Zenithz Cloud | Java Bot Hosting",
+                desc: "Optimized heap configuration memory for heavy JDA (Java Discord API) frameworks.",
+                badge: "OpenJDK 17 / 21",
+                runtime: "JVM Cluster",
+                pkg: "Maven / Gradle",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg"
+            },
+            csharp: {
+                title: "C# (.NET) Bot Server Plans",
+                meta: "Configuration Terminal // .NET Core",
+                seoTitle: "Zenithz Cloud | C# Bot Hosting",
+                desc: "Designed for high concurrency enterprise applications running Discord.Net assemblies.",
+                badge: ".NET 8.0 Core",
+                runtime: "CLR Engine",
+                pkg: "NuGet Client",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg"
+            },
+            golang: {
+                title: "Go (Golang) Bot Server Plans",
+                meta: "Configuration Terminal // Go Compiled",
+                seoTitle: "Zenithz Cloud | Golang Bot Hosting",
+                desc: "Ultra-low CPU usage instances built for massive multi-guild structures running DiscordGo.",
+                badge: "Go 1.22+",
+                runtime: "Native Binary",
+                pkg: "Go Modules",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg"
+            },
+            rust: {
+                title: "Rust Bot Server Plans",
+                meta: "Configuration Terminal // Rust Native",
+                seoTitle: "Zenithz Cloud | Rust Bot Hosting",
+                desc: "Blazing fast operations with absolute type safety for Serenity and Twilight codebases.",
+                badge: "Rust Stable",
+                runtime: "Native Exec",
+                pkg: "Cargo Toolchain",
+                isCustomHtmlLogo: true,
+                htmlMarkup: '<div class="css-logo-frame"><div class="rust-logo-html">R</div></div>'
+            },
+            luvit: {
+                title: "Luvit (Lua) Bot Server Plans",
+                meta: "Configuration Terminal // Luvit / Lua",
+                seoTitle: "Zenithz Cloud | Luvit Bot Hosting",
+                desc: "Asynchronous event-driven framework ideal for running light Discordia scripts cleanly.",
+                badge: "Luvit / LuaJIT",
+                runtime: "Libuv + LuaJIT",
+                pkg: "lit manager",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/lua/lua-original.svg"
+            },
+            deno: {
+                title: "Deno Bot Server Plans",
+                meta: "Configuration Terminal // Deno Secure",
+                seoTitle: "Zenithz Cloud | Deno Bot Hosting",
+                desc: "Secure sandbox runtimes supporting direct module imports for modern TypeScript frameworks.",
+                badge: "Deno v1.40+",
+                runtime: "V8 Sandbox",
+                pkg: "URL Imports / JSR",
+                isCustomHtmlLogo: true,
+                htmlMarkup: '<div class="css-logo-frame"><div class="deno-logo-html">🦕</div></div>'
+            },
+            bun: {
+                title: "Bun Bot Server Plans",
+                meta: "Configuration Terminal // Bun Runtime",
+                seoTitle: "Zenithz Cloud | Bun Bot Hosting",
+                desc: "Next-generation JavaScript environment featuring instant boot times and built-in hot reloading.",
+                badge: "Bun v1.1+",
+                runtime: "JavaScriptCore",
+                pkg: "bun install native",
+                isCustomHtmlLogo: true,
+                htmlMarkup: '<div class="css-logo-frame"><div class="bun-logo-html">🥟</div></div>'
+            },
+            dart: {
+                title: "Dart Bot Server Plans",
+                meta: "Configuration Terminal // Dart VM",
+                seoTitle: "Zenithz Cloud | Dart Bot Hosting",
+                desc: "Structured, asynchronous instances optimized for rapid event handling and stream APIs.",
+                badge: "Dart 3.x Native",
+                runtime: "Dart Virtual VM",
+                pkg: "pub package tool",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg"
+            },
+            elixir: {
+                title: "Elixir Bot Server Plans",
+                meta: "Configuration Terminal // BEAM Virtual",
+                seoTitle: "Zenithz Cloud | Elixir Bot Hosting",
+                desc: "Fault-tolerant actor model clusters running Nostrum or Alchemy for 100% stable systems.",
+                badge: "Erlang BEAM",
+                runtime: "BEAM Cluster VM",
+                pkg: "Mix build tool",
+                isCustomHtmlLogo: false,
+                icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/elixir/elixir-original.svg"
+            }
+        };
+
+        // Render Cards programmatically into Grid Mount points
+        function buildLanguagesCatalogUI() {
+            const catalogGrid = document.getElementById('languages-catalog-mount');
+            if(!catalogGrid) return;
+            catalogGrid.innerHTML = '';
+
+            Object.keys(gameRoutingCatalog).forEach(key => {
+                const item = gameRoutingCatalog[key];
+                
+                // Determine banner logo configuration (Image vs HTML elements)
+                const logoContent = item.isCustomHtmlLogo 
+                    ? item.htmlMarkup 
+                    : `<img src="${item.icon}" alt="${key}" class="game-banner-image">`;
+
+                const cardHtml = `
+                    <div class="game-card" style="cursor: pointer;" onclick="navigateToRoute('/botplans/${key}')">
+                        <div class="game-banner">
+                            <div class="game-badge">${item.badge}</div>
+                            ${logoContent}
+                        </div>
+                        <div class="game-content">
+                            <div class="game-header">
+                                <h3>${key === 'csharp' ? 'C# (.NET)' : key === 'nodejs' ? 'Node.js' : item.title.split(' ')[0]} Bot Hosting</h3>
+                                <p class="game-description">${item.desc}</p>
+                            </div>
+                            <div class="game-specs">
+                                <div class="spec-item">
+                                    <div class="spec-icon"><i data-lucide="cpu" style="width:16px; height:16px;"></i></div>
+                                    <div class="spec-details"><span>Runtime</span><strong>${item.runtime}</strong></div>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon"><i data-lucide="layers" style="width:16px; height:16px;"></i></div>
+                                    <div class="spec-details"><span>Packages</span><strong>${item.pkg}</strong></div>
+                                </div>
+                            </div>
+                            <button class="btn-order">View Plans</button>
+                        </div>
+                    </div>
+                `;
+                catalogGrid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+            reloadLucideIcons();
+        }
+
+        function navigateToRoute(routePath) {
+            if (window.location.pathname !== routePath) {
+                history.pushState({ path: routePath }, '', routePath);
+            }
+            processClientViewRouting(routePath);
+        }
+
+        window.onpopstate = function(event) {
+            const pathName = event.state && event.state.path ? event.state.path : window.location.pathname;
+            processClientViewRouting(pathName);
+        };
+
+        window.addEventListener('load', () => {
+            buildLanguagesCatalogUI();
+            processClientViewRouting(window.location.pathname);
+        });
+
+        function processClientViewRouting(rawPath) {
+            let sanitizedPath = rawPath.toLowerCase().trim();
+            if (sanitizedPath === '' || sanitizedPath === '/' || sanitizedPath === '/index.html') {
+                sanitizedPath = '/botplans';
+            }
+
+            const titleMetaElement = document.getElementById('site-title');
+
+            if (sanitizedPath === '/botplans') {
+                switchViewDOM('games-overview');
+                titleMetaElement.innerText = "Zenithz Cloud | Premium Discord Bot Hosting Plans";
+            } else if (sanitizedPath.startsWith('/botplans/')) {
+                const requestedId = sanitizedPath.split('/botplans/')[1];
+                if (gameRoutingCatalog[requestedId]) {
+                    const metadataObject = gameRoutingCatalog[requestedId];
+                    
+                    document.getElementById('config-meta-title').innerText = metadataObject.meta;
+                    document.getElementById('config-main-title').innerText = metadataObject.title;
+                    titleMetaElement.innerText = metadataObject.seoTitle;
+
+                    renderPlanCards();
+                    switchViewDOM('game-configurator');
+                } else {
+                    navigateToRoute('/botplans');
+                }
+            } else {
+                navigateToRoute('/botplans');
+            }
+        }
+
+        function switchViewDOM(viewId) {
+            document.querySelectorAll('.app-view').forEach(view => {
+                view.classList.remove('view-active');
+                view.style.display = 'none';
+            });
+
+            const trueTargetId = (viewId === 'game-configurator') ? 'view-game-configurator' : 'view-games-overview';
+            const targetActiveView = document.getElementById(trueTargetId);
+            
+            if (targetActiveView) {
+                targetActiveView.style.display = 'block';
+                setTimeout(() => { targetActiveView.classList.add('view-active'); }, 10);
+            }
+
+            const returnBtn = document.getElementById('nav-action-btn');
+            returnBtn.style.visibility = (viewId !== 'games-overview') ? 'visible' : 'hidden';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        let currentArchitecture = 'amd';
+        let currentZone = 'India';
+        let currentCurrency = 'INR';
+
+        const INR_TO_USD = 0.012; 
+        const USD_TO_INR = 83.33; 
+
+        // Configurations reflecting exact target requirements (AMD: 49/GB, Intel: 29/GB)
+        const nodeHardwareData = {
+            India: {
+                currencyBase: 'INR',
+                amd: { rate: 49, plans: [49, 98, 196, 392, 784] },
+                intel: { rate: 29, plans: [29, 58, 116, 232, 464] }
+            },
+            Germany: {
+                currencyBase: 'USD',
+                amd: { rate: 1.2, plans: [1.2, 2.4, 4.8, 9.6, 19.2] },
+                intel: { rate: 0.7, plans: [0.7, 1.4, 2.8, 5.6, 11.2] }
+            },
+            Singapore: {
+                currencyBase: 'USD',
+                amd: { rate: 1.0, plans: [1.0, 2.0, 4.0, 8.0, 16.0] },
+                intel: { rate: 0.6, plans: [0.6, 1.2, 2.4, 4.8, 9.6] }
+            }
+        };
+
+        const cpuCoreMapping = { amd: [0.5, 1, 2, 3, 4], intel: [0.5, 0.5, 1, 2, 3] };
+        const ramSizingMatrix = [1, 2, 4, 8, 16];
+
+        function selectArchitecture(archId) {
+            currentArchitecture = archId;
+            document.querySelectorAll('.arch-card').forEach(c => c.classList.remove('arch-selected'));
+            document.getElementById('arch-' + archId).classList.add('arch-selected');
+            renderPlanCards(true); 
+        }
+
+        function handleLocationOrCurrencyChange() {
+            currentZone = document.getElementById('location-select').value;
+            currentCurrency = document.getElementById('currency-select').value;
+            
+            const displayAMD = document.getElementById('rate-display-amd');
+            const displayINTEL = document.getElementById('rate-display-intel');
+            const dataZone = nodeHardwareData[currentZone];
+            const symbol = currentCurrency === 'INR' ? '₹' : '$';
+
+            let amdRate = dataZone.amd.rate;
+            let intelRate = dataZone.intel.rate;
+
+            if (dataZone.currencyBase === 'INR' && currentCurrency === 'USD') {
+                amdRate = (amdRate * INR_TO_USD).toFixed(2);
+                intelRate = (intelRate * INR_TO_USD).toFixed(2);
+            } else if (dataZone.currencyBase === 'USD' && currentCurrency === 'INR') {
+                amdRate = Math.round(amdRate * USD_TO_INR);
+                intelRate = Math.round(intelRate * USD_TO_INR);
+            }
+
+            if (displayAMD) displayAMD.innerText = `${symbol}${amdRate} / GB`;
+            if (displayINTEL) displayINTEL.innerText = `${symbol}${intelRate} / GB`;
+            renderPlanCards(true);
+        }
+
+        function renderPlanCards(triggerAnim = false) {
+            const container = document.getElementById('dynamic-plans-container');
+            if (!container) return; 
+            container.innerHTML = ''; 
+
+            const dataZone = nodeHardwareData[currentZone];
+            const symbol = currentCurrency === 'INR' ? '₹' : '$';
+            const activeDataset = dataZone[currentArchitecture];
+            const coresArray = cpuCoreMapping[currentArchitecture];
+
+            ramSizingMatrix.forEach((ram, idx) => {
+                let initialCost = activeDataset.plans[idx];
+                let dynamicConvertedPrice = initialCost;
+
+                if (dataZone.currencyBase === 'INR' && currentCurrency === 'USD') {
+                    dynamicConvertedPrice = (initialCost * INR_TO_USD).toFixed(2);
+                } else if (dataZone.currencyBase === 'USD' && currentCurrency === 'INR') {
+                    dynamicConvertedPrice = Math.round(initialCost * USD_TO_INR);
+                }
+
+                const coresCount = coresArray[idx];
+                const calculatedStorage = ram * 5; 
+
+                const planCardHtml = `
+                    <div class="plan-spec-card ${triggerAnim ? 'updated-anim' : ''}">
+                        <div>
+                            <div class="plan-spec-header">
+                                <h4>${ram} GB Plan Capacity</h4>
+                                <div class="plan-price">${symbol}${dynamicConvertedPrice} <span>/ Monthly</span></div>
+                            </div>
+                            <ul class="matrix-spec-list">
+                                <li>
+                                    <div class="spec-list-icon"><i data-lucide="layers" style="width:14px; height:14px;"></i></div>
+                                    <div>
+                                        <span class="spec-meta-title">Allocated RAM Memory</span>
+                                        <span class="spec-meta-value">${ram} GB DDR5 RAM</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="spec-list-icon"><i data-lucide="cpu" style="width:14px; height:14px;"></i></div>
+                                    <div>
+                                        <span class="spec-meta-title">Allocated CPU Cores</span>
+                                        <span class="spec-meta-value">${coresCount} Dedicated vCores</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="spec-list-icon"><i data-lucide="database" style="width:14px; height:14px;"></i></div>
+                                    <div>
+                                        <span class="spec-meta-title">Fast NVMe SSD Disk Space</span>
+                                        <span class="spec-meta-value">${calculatedStorage} GB NVMe Space</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <button class="btn-order" onclick="dispatchPurchaseModal()">
+                            Deploy This Bot Server
+                        </button>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', planCardHtml);
+            });
+            reloadLucideIcons();
+        }
+
+        function dispatchPurchaseModal() {
+            document.getElementById('purchase-modal').style.display = 'block';
+        }
+
+        // Renamed function slightly to break any duplicate artifact traces
+        function closePurchaseModal() {
+            document.getElementById('purchase-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
